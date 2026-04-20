@@ -1,0 +1,8 @@
+.git
+.gitignore
+.idea
+target
+uploads
+data
+README.md
+Set-Location

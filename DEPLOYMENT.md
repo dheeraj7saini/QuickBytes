@@ -27,9 +27,14 @@ GRANT ALL PRIVILEGES ON foodapp.* TO 'foodapp_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-## 2. Backend deployment
+## 2. Backend deployment on Render
 
-Set these environment variables on the backend host:
+Create a Render Web Service from your GitHub repo with these settings:
+
+- Runtime: `Docker`
+- Root Directory: `backend`
+
+Set these environment variables on the backend service:
 
 ```bash
 DB_URL=jdbc:mysql://YOUR_DB_HOST:3306/foodapp
@@ -44,18 +49,17 @@ Optional:
 SERVER_PORT=8080
 ```
 
-Build and run:
-
-```bash
-mvn clean package
-java -jar target/backend-0.0.1-SNAPSHOT.jar
-```
+Render will build the backend from `backend/Dockerfile`, so you do not need a separate build or start command.
 
 The backend serves uploaded files from:
 
 - `/uploads/**`
 
-Keep the `uploads` folder on persistent disk in production.
+Attach a Render Persistent Disk and mount it at:
+
+- `/opt/render/project/src/uploads`
+
+Keep `UPLOAD_DIR=/opt/render/project/src/uploads` in the backend environment so uploaded files survive restarts and redeploys on the same Render service.
 
 ## 3. Frontend deployment
 
@@ -93,6 +97,7 @@ Use:
 VITE_API_BASE_URL=https://quickbytes-api.onrender.com/api
 VITE_SERVER_BASE_URL=https://quickbytes-api.onrender.com
 APP_CORS_ALLOWED_ORIGINS=https://quickbytes-frontend.vercel.app
+UPLOAD_DIR=/opt/render/project/src/uploads
 ```
 
 ## 6. One caution
